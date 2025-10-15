@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor RCP</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <i class="fas fa-heartbeat header-icon"></i>
+                <h1>Monitor RCP</h1>
+            </div>
+        </header>
+
+        <!-- Session Controls -->
+        <div class="session-controls">
+            <button id="startSessionBtn" class="btn btn-primary">
+                <i class="fas fa-play"></i>
+                Iniciar Sesión
+            </button>
+            <button id="endSessionBtn" class="btn btn-danger" disabled>
+                <i class="fas fa-stop"></i>
+                Finalizar Sesión
+            </button>
+            <div class="session-timer">
+                <span id="sessionTime">00:00:00</span>
+            </div>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="metrics-grid">
+            <!-- Current BPM Card -->
+            <div class="metric-card">
+                <div class="card-header">
+                    <h3>BPM Actual</h3>
+                    <i class="fas fa-heartbeat card-icon"></i>
+                </div>
+                <div class="metric-value" id="currentBPM">0.0</div>
+                <div class="metric-unit">bpm</div>
+                <div class="metric-subtitle">Frecuencia cardíaca en tiempo real</div>
+            </div>
+
+            <!-- Current Distance Card -->
+            <div class="metric-card">
+                <div class="card-header">
+                    <h3>Distancia Actual</h3>
+                    <i class="fas fa-ruler card-icon"></i>
+                </div>
+                <div class="metric-value" id="currentDistance">0.0</div>
+                <div class="metric-unit">cm</div>
+                <div class="metric-subtitle">Profundidad de compresión</div>
+            </div>
+
+            <!-- Metronome Card -->
+            <div class="metric-card">
+                <div class="card-header">
+                    <h3>Metrónomo</h3>
+                    <i class="fas fa-music card-icon"></i>
+                </div>
+                <div class="metronome-controls">
+                    <input type="number" id="metronomeBPM" value="120" min="60" max="200" class="metronome-input">
+                    <span class="metronome-unit">BPM</span>
+                    <button id="metronomeBtn" class="btn btn-secondary">
+                        <i class="fas fa-play"></i>
+                        Iniciar
+                    </button>
+                </div>
+                <div class="metronome-status">
+                    Estado: <span id="metronomeStatus">Desactivado</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-container">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>BPM a lo Largo del Tiempo</h3>
+                    <div class="chart-subtitle">Últimos 15 puntos de datos</div>
+                </div>
+                <canvas id="bpmChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Session Data -->
+        <div class="session-data" id="sessionData" style="display: none;">
+            <div class="data-card">
+                <h3>Datos de la Sesión</h3>
+                <div class="data-grid">
+                    <div class="data-item">
+                        <span class="data-label">Duración:</span>
+                        <span class="data-value" id="sessionDuration">00:00:00</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">BPM Promedio:</span>
+                        <span class="data-value" id="averageBPM">0.0</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">BPM Máximo:</span>
+                        <span class="data-value" id="maxBPM">0.0</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">BPM Mínimo:</span>
+                        <span class="data-value" id="minBPM">0.0</span>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de la sesión -->
+                <div class="session-chart-container">
+                    <h4>Gráfico de la Sesión</h4>
+                    <canvas id="sessionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Person Name -->
+    <div id="nameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sesión Completada</h2>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Ingresa el nombre de la persona que realizó la sesión:</p>
+                <input type="text" id="personName" placeholder="Nombre de la persona" class="name-input">
+                <div class="modal-actions">
+                    <button id="saveSessionBtn" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Guardar y Descargar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Conectando con Firebase...</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

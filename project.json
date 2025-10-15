@@ -1,0 +1,74 @@
+{
+  "name": "Monitor RCP",
+  "version": "1.0.0",
+  "description": "Sistema completo de monitoreo de RCP con Arduino y aplicación web",
+  "type": "iot-healthcare",
+  "hardware": {
+    "microcontroller": "ESP32",
+    "sensors": [
+      {
+        "name": "VL53L0X",
+        "type": "distance",
+        "purpose": "medir profundidad de compresión"
+      },
+      {
+        "name": "Limit Switch",
+        "type": "digital",
+        "purpose": "detectar compresiones"
+      }
+    ],
+    "connectivity": "WiFi"
+  },
+  "software": {
+    "arduino": {
+      "file": "pepe.ino",
+      "libraries": [
+        "FirebaseESP32",
+        "Adafruit_VL53L0X",
+        "WiFi"
+      ],
+      "board": "ESP32"
+    },
+    "web": {
+      "directory": "Webpepe",
+      "main": "index.html",
+      "dependencies": [
+        "Chart.js",
+        "Firebase",
+        "jsPDF"
+      ],
+      "features": [
+        "real-time monitoring",
+        "responsive design",
+        "pdf generation",
+        "firebase integration"
+      ]
+    }
+  },
+  "features": [
+    "Monitoreo en tiempo real",
+    "Cálculo automático de BPM",
+    "Medición de profundidad de compresión",
+    "Interfaz web responsiva",
+    "Generación de reportes PDF",
+    "Integración con Firebase",
+    "Metrónomo integrado",
+    "Control de sesiones"
+  ],
+  "target_audience": [
+    "instructores de RCP",
+    "estudiantes de medicina",
+    "personal de emergencias",
+    "instituciones educativas"
+  ],
+  "deployment": {
+    "arduino": "upload to ESP32",
+    "web": "serve from any web server",
+    "firebase": "configure credentials"
+  },
+  "testing": {
+    "arduino": "hardware testing required",
+    "web": "use test.html for diagnostics",
+    "integration": "verify firebase connection"
+  }
+}

@@ -1,2 +1,42 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Configuración de Git para el proyecto Monitor RCP
+
+# Archivos de texto
+*.md text
+*.txt text
+*.json text
+*.js text
+*.css text
+*.html text
+*.ino text
+
+# Archivos binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+
+# Archivos de configuración
+*.yml text
+*.yaml text
+*.xml text
+
+# Archivos de Python
+*.py text
+*.pyc binary
+
+# Archivos de sistema
+.DS_Store binary
+Thumbs.db binary
+
+# Archivos de IDE
+*.swp text
+*.swo text
+
+# Archivos de log
+*.log text
+
+# Archivos de backup
+*.bak text
+*.backup text

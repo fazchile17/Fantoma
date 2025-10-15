@@ -1,0 +1,46 @@
+{
+  "name": "monitor-rcp",
+  "version": "1.0.0",
+  "description": "Sistema de monitoreo en tiempo real para sesiones de RCP con Arduino y aplicación web",
+  "main": "Webpepe/index.html",
+  "scripts": {
+    "start": "cd Webpepe && python -m http.server 8000",
+    "test": "echo 'Abrir Webpepe/test.html en el navegador para ejecutar tests'",
+    "validate": "echo 'Validando archivos del proyecto...'",
+    "docs": "echo 'Documentación disponible en README.md y Webpepe/README.md'"
+  },
+  "keywords": [
+    "rcp",
+    "cpr",
+    "arduino",
+    "esp32",
+    "firebase",
+    "monitoring",
+    "healthcare",
+    "education",
+    "sensors",
+    "real-time"
+  ],
+  "author": "Bruno",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/monitor-rcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tu-usuario/monitor-rcp/issues"
+  },
+  "homepage": "https://github.com/tu-usuario/monitor-rcp#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "files": [
+    "pepe.ino",
+    "Webpepe/",
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md"
+  ]
+}

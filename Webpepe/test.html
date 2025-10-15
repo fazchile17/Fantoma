@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Monitor RCP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .warning { background: #fff3cd; border-color: #ffeaa7; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test de Dependencias - Monitor RCP</h1>
+        
+        <div id="testResults"></div>
+        
+        <h3>Acciones de Prueba:</h3>
+        <button onclick="testFirebaseConnection()">Probar Conexión Firebase</button>
+        <button onclick="testSaveSession()">Probar Guardado de Sesión</button>
+        <button onclick="testPDFGeneration()">Probar Generación PDF</button>
+        <button onclick="testChartGeneration()">Probar Captura Gráfico</button>
+        <button onclick="runAllTests()">Ejecutar Todas las Pruebas</button>
+        
+        <div id="testOutput" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-family: monospace; white-space: pre-wrap;"></div>
+    </div>
+
+    <!-- Cargar las mismas dependencias que la app principal -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script src="config.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        let testOutput = document.getElementById('testOutput');
+        let testResults = document.getElementById('testResults');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            testOutput.textContent += `[${timestamp}] ${message}\n`;
+            testOutput.scrollTop = testOutput.scrollHeight;
+        }
+        
+        function addTestResult(name, status, message) {
+            const div = document.createElement('div');
+            div.className = `test-item ${status}`;
+            div.innerHTML = `<strong>${name}:</strong> ${message}`;
+            testResults.appendChild(div);
+        }
+        
+        // Test 1: Verificar dependencias
+        function testDependencies() {
+            log('🔍 Verificando dependencias...');
+            
+            const tests = [
+                { name: 'Chart.js', check: () => typeof Chart !== 'undefined' },
+                { name: 'Firebase', check: () => typeof firebase !== 'undefined' },
+                { name: 'jsPDF', check: () => typeof window.jspdf !== 'undefined' },
+                { name: 'Config', check: () => typeof window.AppConfig !== 'undefined' },
+                { name: 'Firebase Config', check: () => typeof window.firebaseConfig !== 'undefined' },
+                { name: 'saveSessionToFirebase', check: () => typeof window.saveSessionToFirebase === 'function' },
+                { name: 'checkFirebaseConnection', check: () => typeof window.checkFirebaseConnection === 'function' }
+            ];
+            
+            let allPassed = true;
+            
+            tests.forEach(test => {
+                const passed = test.check();
+                if (passed) {
+                    addTestResult(test.name, 'success', '✅ Disponible');
+                    log(`✅ ${test.name}: OK`);
+                } else {
+                    addTestResult(test.name, 'error', '❌ No disponible');
+                    log(`❌ ${test.name}: FALTA`);
+                    allPassed = false;
+                }
+            });
+            
+            return allPassed;
+        }
+        
+        // Test 2: Conexión a Firebase
+        async function testFirebaseConnection() {
+            log('🔥 Probando conexión a Firebase...');
+            
+            try {
+                if (typeof window.checkFirebaseConnection !== 'function') {
+                    throw new Error('Función checkFirebaseConnection no disponible');
+                }
+                
+                await window.checkFirebaseConnection();
+                addTestResult('Conexión Firebase', 'success', '✅ Conectado correctamente');
+                log('✅ Firebase: Conexión exitosa');
+            } catch (error) {
+                addTestResult('Conexión Firebase', 'error', `❌ Error: ${error.message}`);
+                log(`❌ Firebase: ${error.message}`);
+            }
+        }
+        
+        // Test 3: Guardado de sesión
+        async function testSaveSession() {
+            log('💾 Probando guardado de sesión...');
+            
+            try {
+                if (typeof window.saveSessionToFirebase !== 'function') {
+                    throw new Error('Función saveSessionToFirebase no disponible');
+                }
+                
+                const testData = {
+                    personName: 'Test User',
+                    startTime: new Date().toISOString(),
+                    endTime: new Date().toISOString(),
+                    duration: '00:01:00',
+                    averageBPM: 100.5,
+                    maxBPM: 120.0,
+                    minBPM: 80.0,
+                    totalDataPoints: 10,
+                    bpmData: [],
+                    distanceData: []
+                };
+                
+                await window.saveSessionToFirebase(testData);
+                addTestResult('Guardado Sesión', 'success', '✅ Sesión guardada correctamente');
+                log('✅ Guardado: Sesión de prueba guardada');
+            } catch (error) {
+                addTestResult('Guardado Sesión', 'warning', `⚠️ Error: ${error.message}`);
+                log(`⚠️ Guardado: ${error.message}`);
+            }
+        }
+        
+        // Test 4: Generación de PDF
+        function testPDFGeneration() {
+            log('📄 Probando generación de PDF...');
+            
+            try {
+                if (typeof window.jspdf === 'undefined') {
+                    throw new Error('jsPDF no disponible');
+                }
+                
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.text('Test PDF', 20, 20);
+                doc.text('Este es un PDF de prueba', 20, 30);
+                
+                // No descargar, solo verificar que se puede crear
+                const pdfData = doc.output('datauristring');
+                
+                if (pdfData && pdfData.length > 0) {
+                    addTestResult('Generación PDF', 'success', '✅ PDF generado correctamente');
+                    log('✅ PDF: Generación exitosa');
+                } else {
+                    throw new Error('PDF vacío');
+                }
+            } catch (error) {
+                addTestResult('Generación PDF', 'error', `❌ Error: ${error.message}`);
+                log(`❌ PDF: ${error.message}`);
+            }
+        }
+        
+        // Test 5: Captura de gráfico para PDF
+        function testChartGeneration() {
+            log('📊 Probando captura de gráfico...');
+            
+            try {
+                if (typeof Chart === 'undefined') {
+                    throw new Error('Chart.js no disponible');
+                }
+                
+                // Crear datos de prueba
+                const testData = [
+                    { label: '10:00:00', value: 100 },
+                    { label: '10:00:05', value: 105 },
+                    { label: '10:00:10', value: 98 },
+                    { label: '10:00:15', value: 110 },
+                    { label: '10:00:20', value: 102 }
+                ];
+                
+                // Crear canvas temporal
+                const canvas = document.createElement('canvas');
+                canvas.width = 400;
+                canvas.height = 200;
+                const ctx = canvas.getContext('2d');
+                
+                // Crear gráfico temporal
+                const tempChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: testData.map(point => point.label),
+                        datasets: [{
+                            label: 'BPM Test',
+                            data: testData.map(point => point.value),
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        maintainAspectRatio: false
+                    }
+                });
+                
+                // Simular captura del gráfico (como en la app real)
+                const imageData = canvas.toDataURL('image/png', 1.0);
+                
+                // Destruir gráfico temporal
+                tempChart.destroy();
+                
+                if (imageData && imageData.length > 0) {
+                    addTestResult('Captura Gráfico', 'success', '✅ Gráfico capturado correctamente');
+                    log('✅ Gráfico: Captura exitosa');
+                } else {
+                    throw new Error('Imagen del gráfico vacía');
+                }
+                
+            } catch (error) {
+                addTestResult('Captura Gráfico', 'error', `❌ Error: ${error.message}`);
+                log(`❌ Gráfico: ${error.message}`);
+            }
+        }
+        
+        // Ejecutar todas las pruebas
+        async function runAllTests() {
+            log('🚀 Ejecutando todas las pruebas...');
+            testResults.innerHTML = '';
+            testOutput.textContent = '';
+            
+            // Test 1: Dependencias
+            const depsOk = testDependencies();
+            
+            if (depsOk) {
+                // Test 2: Firebase
+                await testFirebaseConnection();
+                
+                // Test 3: Guardado
+                await testSaveSession();
+            }
+            
+            // Test 4: PDF (siempre se puede probar)
+            testPDFGeneration();
+            
+            // Test 5: Gráfico (siempre se puede probar)
+            testChartGeneration();
+            
+            log('✅ Todas las pruebas completadas');
+        }
+        
+        // Ejecutar verificación inicial
+        window.addEventListener('load', () => {
+            log('🔧 Iniciando verificación de dependencias...');
+            testDependencies();
+        });
+    </script>
+</body>
+</html>
